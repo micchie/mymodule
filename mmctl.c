@@ -74,6 +74,7 @@ main(int argc, char **argv)
 	nmd = nm_open(name, NULL, 0, NULL);
 	if (nmd == NULL) {
 		D("Unable to open %s", name);
+		return -1;
 	}
 
 	if (ioctl(nmd->fd, NIOCCONFIG, &mreq)) {
