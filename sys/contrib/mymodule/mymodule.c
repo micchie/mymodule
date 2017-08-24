@@ -92,7 +92,7 @@ u_int
 my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 		struct netmap_vp_adapter *vpna)
 {
-	char *buf = ft->ft_buf;
+	//char *buf = ft->ft_buf;
 	u_int my_port = vpna->bdg_port;
 
 	/* You can do whatever youw ant on buf */
@@ -161,7 +161,7 @@ mymodule_init(void)
 	}
 	bzero(my_routes, sizeof(my_routes));
 
-	printf("Mymodule: loaded module\n");
+	//printf("Mymodule: loaded module\n");
 	return 0;
 }
 
@@ -179,7 +179,7 @@ mymodule_fini(void)
 	error = netmap_bdg_ctl(&nmr, &tmp);
 	if (error)
 		D("failed to release VALE bridge %d", error);
-	printf("Mymodule: Unloaded module\n");
+	//printf("Mymodule: Unloaded module\n");
 }
 
 #ifdef __FreeBSD__
