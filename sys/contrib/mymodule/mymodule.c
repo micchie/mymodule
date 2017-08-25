@@ -94,11 +94,19 @@ my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 {
 	//char *buf = ft->ft_buf;
 	u_int my_port = vpna->bdg_port;
+#if 0
 
 	/* You can do whatever youw ant on buf */
 	/* You can also specify dst ring index on hint */
 
 	return my_routes[my_port];
+#endif
+	int eth_type = ntohs(*(uint16_t *)(buf + 12));
+
+	if (eth_type == 0x0800) {
+		return my_port + 1;
+	}
+	return NETMAP_BDG_BROADCAST;
 }
 
 static void
