@@ -92,7 +92,7 @@ u_int
 my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 		struct netmap_vp_adapter *vpna)
 {
-	//char *buf = ft->ft_buf;
+	char *buf = ft->ft_buf;
 	u_int my_port = vpna->bdg_port;
 #if 0
 
@@ -106,7 +106,7 @@ my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 	if (eth_type == 0x0800) {
 		return my_port + 1;
 	}
-	return NETMAP_BDG_BROADCAST;
+	return NM_BDG_BROADCAST;
 }
 
 static void
