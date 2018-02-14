@@ -82,7 +82,8 @@ struct ip {
 #include <dev/netmap/netmap_kern.h> /* XXX Provide path in Makefile */
 #include <net/mymodule.h>
 
-#define MY_NAME		"vale0:"
+#define MY_NAME0		"vale0:"
+#define MY_NAME1		"vale1:"
 
 u_int my_lookup(struct nm_bdg_fwd *, uint8_t *, struct netmap_vp_adapter *);
 
@@ -94,19 +95,26 @@ my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 {
 	char *buf = ft->ft_buf;
 	u_int my_port = vpna->bdg_port;
+	uint16_t eth_type;
 #if 0
 
 	/* You can do whatever youw ant on buf */
 	/* You can also specify dst ring index on hint */
+	if(my_port==0)
+		return NM_BDG_BROADCAST;
+	else
+		return 0;
 
-	return my_routes[my_port];
 #endif
-	int eth_type = ntohs(*(uint16_t *)(buf + 12));
+	if(my_port>0)
+		return 0;
+	eth_type = ntohs(*(uint16_t *)(buf + 12));
 
 	if (eth_type == 0x0800) {
-		return my_port + 1;
-	}
-	return NM_BDG_BROADCAST;
+		u_int dst_ip_last_half = ntohs(*(uint16_t *)(buf+32));
+		return dst_ip_last_half;
+	} else
+		return NM_BDG_MAXPORTS;
 }
 
 static void
@@ -160,8 +168,14 @@ mymodule_init(void)
 
 	bzero(&nmr, sizeof(nmr));
 	nmr.nr_version = NETMAP_API;
-	strncpy(nmr.nr_name, MY_NAME, strlen(MY_NAME));
+	strncpy(nmr.nr_name, MY_NAME0, strlen(MY_NAME0));
 	nmr.nr_cmd = NETMAP_BDG_REGOPS;
+	if (netmap_bdg_ctl(&nmr, &my_ops)) {
+		D("create a bridge named %s beforehand using vale-ctl",
+			nmr.nr_name);
+		return ENOENT;
+	}
+	strncpy(nmr.nr_name, MY_NAME1, strlen(MY_NAME1));
 	if (netmap_bdg_ctl(&nmr, &my_ops)) {
 		D("create a bridge named %s beforehand using vale-ctl",
 			nmr.nr_name);
@@ -182,11 +196,18 @@ mymodule_fini(void)
 
 	bzero(&nmr, sizeof(nmr));
 	nmr.nr_version = NETMAP_API;
-	strncpy(nmr.nr_name, MY_NAME, sizeof(nmr.nr_name));
 	nmr.nr_cmd = NETMAP_BDG_REGOPS;
+	strncpy(nmr.nr_name, MY_NAME0, sizeof(nmr.nr_name));
 	error = netmap_bdg_ctl(&nmr, &tmp);
 	if (error)
 		D("failed to release VALE bridge %d", error);
+/*
+	strncpy(nmr.nr_name, MY_NAME1, sizeof(nmr.nr_name));
+	error = netmap_bdg_ctl(&nmr, &tmp);
+	if (error)
+		D("failed to release VALE bridge %d", error);
+*/
+
 	//printf("Mymodule: Unloaded module\n");
 }
 
