@@ -93,9 +93,11 @@ u_int
 my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 		struct netmap_vp_adapter *vpna)
 {
-	char *buf = ft->ft_buf;
+	//char *buf = ft->ft_buf;
+	struct netmap_slot *slot = ft->ft_buf;
 	u_int my_port = vpna->bdg_port;
 	uint16_t eth_type;
+	char *buf = NMB(&vpna->up, slot);
 #if 0
 
 	/* You can do whatever youw ant on buf */
@@ -114,12 +116,13 @@ my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 		u_int dst_ip_last_half = ntohs(*(uint16_t *)(buf+32));
 		return dst_ip_last_half;
 	} else
-		return NM_BDG_MAXPORTS;
+		return NM_BDG_BROADCAST;
 }
 
 static void
 my_dtor(const struct netmap_vp_adapter *vpna)
 {
+	D("called");
 	return;
 }
 
