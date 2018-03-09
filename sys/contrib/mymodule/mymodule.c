@@ -113,16 +113,18 @@ my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 	eth_type = ntohs(*(uint16_t *)(buf + 12));
 
 	if (eth_type == 0x0800) {
-		u_int dst_ip_last_half = ntohs(*(uint16_t *)(buf+32));
-		return dst_ip_last_half;
-	} else
+		uint32_t *dip = (uint32_t *)(buf + ETHER_HDR_LEN + 16);
+		return 0x0000ffff & ntohl(*dip);
+	} else {
+		RD(1, "returning broadcast (eth 0x%04x", eth_type);
 		return NM_BDG_BROADCAST;
+	}
 }
 
 static void
 my_dtor(const struct netmap_vp_adapter *vpna)
 {
-	D("called");
+	ND("called");
 	return;
 }
 
