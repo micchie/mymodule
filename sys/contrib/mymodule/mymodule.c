@@ -94,10 +94,14 @@ my_lookup(struct nm_bdg_fwd *ft, uint8_t *hint,
 		struct netmap_vp_adapter *vpna)
 {
 	//char *buf = ft->ft_buf;
-	struct netmap_slot *slot = ft->ft_buf;
 	u_int my_port = vpna->bdg_port;
 	uint16_t eth_type;
-	char *buf = NMB(&vpna->up, slot);
+	char *buf = ft->ft_buf;
+
+	if (ft->ft_flags & FT_SLOT) {
+		struct netmap_slot *slot = ft->ft_buf;
+		buf = NMB(&vpna->up, slot);
+	}
 #if 0
 
 	/* You can do whatever youw ant on buf */
